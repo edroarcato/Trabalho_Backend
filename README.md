@@ -10,8 +10,8 @@ cd Trabalho_Backend
 
 npx express-generator API_REST --no-view
 npm install
-npm install express mongoose jsonwebtoken dotenv
-npm install --save-dev supertest jest
+npm install express mongoose jsonwebtoken dotenv bcrypt
+npm install --save-dev supertest jest nodemon
 
 
 3. Configure as variáveis de ambiente:
@@ -49,7 +49,7 @@ Conectado ao MongoDB
 
 5. Endpoints protegidos por JWT exigem o header Authorization:
 
-Authorization: Bearer <seu_token_aqui>
+Authorization: Bearer token
 
 
 
@@ -62,7 +62,9 @@ Essas são necessárias para o funcionamento da API:
 npm install express       
 npm install mongoose      
 npm install jsonwebtoken  
-npm install dotenv               
+npm install dotenv
+npm install bcrypt               
+
 
 2. Dependências de desenvolvimento
 
@@ -70,6 +72,7 @@ Essas são utilizadas apenas durante testes e desenvolvimento:
 
 npm install --save-dev jest       
 npm install --save-dev supertest 
+npm install --save-dev nodemon
 
 
 
@@ -115,157 +118,230 @@ Observação: Antes de rodar os testes, verifique se o MongoDB está ativo e que
 
 <!-- EXEMPLOS DE USO: -->
 
-1. Criar uma tarefa (POST /tarefas)
+1. Cadastro de usuário
 
-Request:
+Método: POST  
+URL: http://localhost:3000/users/register
 
-POST /tarefas
-Authorization: Bearer <token>
+Headers:
 Content-Type: application/json
 
+Body (JSON):
+
 {
-  "nome": "Estudar Node.js"
+  "nome": "Pedro Marcato",
+  "email": "pedroaraujomarcato@gmail.com",
+  "senha": "abcd1234"
+}
+Respostas possíveis:
+
+✅ 201 Created
+
+{
+  "id": "671a0e88...",
+  "nome": "Pedro Marcato",
+  "email": "pedroaraujomarcato@gmail.com"
+}
+⚠️ 422 Unprocessable Entity
+
+{ "msg": "Email já cadastrado" }
+
+2. Login de usuário
+
+Método: POST
+URL: http://localhost:3000/users/login
+
+Headers:
+
+Content-Type: application/json
+Body (JSON):
+
+{
+  "email": "pedroaraujomarcato@gmail.com",
+  "senha": "abcd1234"
+}
+Respostas possíveis:
+
+✅ 200 OK
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+⚠️ 401 Unauthorized
+
+{ "msg": "Credenciais inválidas" }
+
+3. Criar um livro
+
+Método: POST
+URL: http://localhost:3000/livros
+
+Headers:
+
+Authorization: Bearer token
+Content-Type: application/json
+
+
+Body (JSON):
+
+{
+  "titulo": "Node.js para Iniciantes",
+  "autor": "Pedro Marcato",
+  "publicadoEm": "2025-11-02",
+  "disponivel": true
 }
 
 
-Response (201 – Criado):
+Respostas possíveis:
+
+✅ 201 Created
 
 {
-  "id": "652e9b9f2f4e4a1a3c5f7e12",
-  "nome": "Estudar Node.js",
-  "concluida": false
+  "_id": "652e9b9f2f4e4a1a3c5f7e20",
+  "titulo": "Node.js para Iniciantes",
+  "autor": "Pedro Marcato",
+  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "disponivel": true
 }
 
 
-Response (422 – Nome inválido):
+⚠️ 422 Unprocessable Entity
 
-{
-  "msg": "Nome da tarefa deve ter pelo menos 3 caracteres"
-}
+{ "msg": "Título deve ter pelo menos 3 caracteres" }
 
 
-2. Listar todas as tarefas (GET /tarefas)
+4. Listar todos os livros
 
-Request:
+Método: GET
+URL: http://localhost:3000/livros
 
-GET /tarefas
+Headers (opcional):
+
+Authorization: Bearer token
 
 
-Response (200 – OK):
+Resposta (200 OK):
 
 [
   {
-    "id": "652e9b9f2f4e4a1a3c5f7e12",
-    "nome": "Estudar Node.js",
-    "concluida": false
+    "_id": "652e9b9f2f4e4a1a3c5f7e20",
+    "titulo": "Node.js para Iniciantes",
+    "autor": "Pedro Marcato",
+    "publicadoEm": "2025-11-02T00:00:00.000Z",
+    "disponivel": true
   },
   {
-    "id": "652e9baf2f4e4a1a3c5f7e13",
-    "nome": "Fazer exercícios",
-    "concluida": true
+    "_id": "652e9baf2f4e4a1a3c5f7e21",
+    "titulo": "Express Avançado",
+    "autor": "Outro Autor",
+    "disponivel": true
   }
 ]
 
 
-3. Obter uma tarefa por ID (GET /tarefas/:id)
+5. Obter um livro por ID
 
-Request:
+Método: GET
+URL: http://localhost:3000/livros/:id
 
-GET /tarefas/652e9b9f2f4e4a1a3c5f7e12
+Exemplo:
+
+http://localhost:3000/livros/652e9b9f2f4e4a1a3c5f7e20
 
 
-Response (200 – OK):
+Respostas:
+
+✅ 200 OK
 
 {
-  "id": "652e9b9f2f4e4a1a3c5f7e12",
-  "nome": "Estudar Node.js",
-  "concluida": false
+  "_id": "652e9b9f2f4e4a1a3c5f7e20",
+  "titulo": "Node.js para Iniciantes",
+  "autor": "Pedro Marcato",
+  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "disponivel": true
 }
 
 
-Response (400 – ID inválido):
+⚠️ 400 Bad Request
 
-{
-  "msg": "ID invalido"
-}
+{ "msg": "ID inválido" }
 
 
-Response (404 – Não encontrado):
+🚫 404 Not Found
 
-{
-  "msg": "Tarefa não encontrada"
-}
+{ "msg": "Livro não encontrado" }
 
 
-4. Atualizar uma tarefa (PUT /tarefas/:id)
+6. Atualizar um livro
 
-Request:
+Método: PUT
+URL: http://localhost:3000/livros/:id
 
-PUT /tarefas/652e9b9f2f4e4a1a3c5f7e12
-Authorization: Bearer <token>
+Headers:
+
+Authorization: Bearer token
 Content-Type: application/json
 
+
+Body (JSON):
+
 {
-  "nome": "Estudar Node.js e Express",
-  "concluida": true
+  "titulo": "Node.js e Express",
+  "disponivel": false
 }
 
 
-Response (200 – OK):
+Respostas:
+
+✅ 200 OK
 
 {
-  "id": "652e9b9f2f4e4a1a3c5f7e12",
-  "nome": "Estudar Node.js e Express",
-  "concluida": true
+  "_id": "652e9b9f2f4e4a1a3c5f7e20",
+  "titulo": "Node.js e Express",
+  "autor": "Pedro Marcato",
+  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "disponivel": false
 }
 
 
-Response (422 – Nome inválido):
+⚠️ 422 Unprocessable Entity
 
-{
-  "msg": "Nome da tarefa é obrigatório"
-}
+{ "msg": "Título deve ter pelo menos 3 caracteres" }
 
 
-Response (400 – ID inválido):
+⚠️ 400 Bad Request
 
-{
-  "msg": "ID invalido"
-}
+{ "msg": "ID inválido" }
 
 
-Response (404 – Não encontrado):
+🚫 404 Not Found
 
-{
-  "msg": "Tarefa não encontrada"
-}
+{ "msg": "Livro não encontrado" }
 
 
-5. Deletar uma tarefa (DELETE /tarefas/:id)
+7. Deletar um livro
 
-Request:
+Método: DELETE
+URL: http://localhost:3000/livros/:id
 
-DELETE /tarefas/652e9b9f2f4e4a1a3c5f7e12
-Authorization: Bearer <token>
+Headers:
 
-
-Response (204 – Sem conteúdo):
-
-HTTP/1.1 204 No Content
+Authorization: Bearer token
 
 
-Response (400 – ID inválido):
+Respostas:
 
-{
-  "msg": "ID invalido"
-}
+✅ 204 No Content
+(sem corpo de resposta)
+
+⚠️ 400 Bad Request
+
+{ "msg": "ID inválido" }
 
 
-Response (404 – Não encontrado):
+🚫 404 Not Found
 
-{
-  "msg": "Tarefa não encontrada"
-}
+{ "msg": "Livro não encontrado" }
 
 
 

@@ -2,24 +2,24 @@ const supertest = require('supertest');
 
 const app = require('../app');
 
-const { gerarToken } = require('../middlewares/auth');
+// const { gerarToken } = require('../middlewares/auth');
 
 const request = supertest(app);
 
 const url = '/tarefas';
 
-// // Adicione aqui o novo token gerado no postman
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNaW5oYSBBUEkiLCJlbWFpbCI6InBlZHJvLm1hcmNhdG9AaWVzYi5lZHUuYnIiLCJub21lIjoiUGVkcm8iLCJwZXJmaWwiOiJhZG1pbiIsImlhdCI6MTc2MTk0MjMxOCwiZXhwIjoxNzYxOTQyNjE4fQ.vVYls7G3-9kqWSsw4B1llofKwp7-FRuFV_OUYi2hVjU";
+// Adicione aqui o novo token gerado no postman
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNaW5oYSBBUEkiLCJlbWFpbCI6InBlZHJvLm1hcmNhdG9AaWVzYi5lZHUuYnIiLCJub21lIjoiUGVkcm8iLCJwZXJmaWwiOiJhZG1pbiIsImlhdCI6MTc2MjA4NDIwMiwiZXhwIjoxNzYyMDg0NTAyfQ.NoOYKLVJ1qswV4_tHKeactij0HloVQHp2WoeEaDYc5Q";
 
 let id = null;
 
-// Cria um token válido dinamicamente
-const token = gerarToken({
-  iss: "Minha API",
-  email: "pedro.marcato@iesb.edu.br",
-  nome: "Pedro",
-  perfil: "admin"
-});
+// // Cria um token válido dinamicamente
+// const token = gerarToken({
+//   iss: "Minha API",
+//   email: "pedro.marcato@iesb.edu.br",
+//   nome: "Pedro",
+//   perfil: "admin"
+// });
 
 describe('Testes do recurso /tarefas', () => {
     

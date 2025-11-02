@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const tarefasRouter = require('./routes/tarefasRouter')
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const livrosRouter = require('./routes/livrosRouter');
 
 const url = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_HOST}/${process.env.MONGODB_DBNAME}`;
 
@@ -24,5 +25,6 @@ app.use(cookieParser());
 app.use('/tarefas', tarefasRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/livros', livrosRouter);
 
 module.exports = app;

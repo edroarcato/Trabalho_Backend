@@ -1,29 +1,59 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');
 const { gerarToken, verificarToken } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.post('/login', function (req, res, next) {
-  const { username, password } = req.body;
-
-  if (username === 'pedro.marcato@iesb.edu.br' && password === 'abcd1234') {
-    const payload = {
-      iss: "Minha API",
-      email: username,
-      nome: "Pedro",
-      perfil: "admin"
-    };
-    try {
-      return res.json({ token: gerarToken(payload) });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+router.post('/register', async (req, res) => {
+  try {
+    const { nome, email, senha } = req.body;
+    const usuarioExistente = await User.findOne({ email });
+    if (usuarioExistente) {
+      return res.status(400).json({ msg: 'E-mail já cadastrado' });
     }
-  }
 
-  return res.status(401).json({ msg: "Credenciais invalidas" })
+    const novoUsuario = await User.create({ nome, email, senha });
+
+    return res.status(201).json({
+      id: novoUsuario._id,
+      nome: novoUsuario.nome,
+      email: novoUsuario.email
+    });
+  } catch (err) {
+    return res.status(400).json({ msg: err.message });
+  }
 });
 
-router.post('/renovar', verificarToken, function (req, res) {
+router.post('/login', async (req, res) => {
+  try {
+    const { email, senha } = req.body;
+
+    const usuario = await User.findOne({ email });
+    if (!usuario) {
+      return res.status(401).json({ msg: 'Usuário não encontrado' });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaValida) {
+      return res.status(401).json({ msg: 'Senha incorreta' });
+    }
+
+    const payload = {
+      iss: "Minha API",
+      email: usuario.email,
+      nome: usuario.nome,
+      perfil: "user"
+    };
+
+    const token = gerarToken(payload);
+    return res.json({ token });
+  } catch (err) {
+    return res.status(500).json({ msg: err.message });
+  }
+});
+
+router.post('/renovar', verificarToken, (req, res) => {
   try {
     const payload = {
       iss: req.payload.iss,

@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: API de Tarefas
+  title: API de Tarefas e Usuários
   description: API REST para gerenciamento de tarefas com autenticação JWT
-  version: "1.0.0"
+  version: "1.1.0"
 
 servers:
   - url: http://localhost:3000
@@ -36,15 +36,15 @@ components:
     LoginRequest:
       type: object
       properties:
-        username:
+        email:
           type: string
-          example: "pedro.marcato@iesb.edu.br"
-        password:
+          example: "pedroaraujomarcato@gmail.com"
+        senha:
           type: string
           example: "abcd1234"
       required:
-        - username
-        - password
+        - email
+        - senha
 
     LoginResponse:
       type: object
@@ -53,7 +53,66 @@ components:
           type: string
           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
+    UserRegisterRequest:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: "Pedro Marcato"
+        email:
+          type: string
+          example: "pedroaraujomarcato@gmail.com"
+        senha:
+          type: string
+          example: "abcd1234"
+      required:
+        - nome
+        - email
+        - senha
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "671a0e88..."
+        nome:
+          type: string
+          example: "Pedro Marcato"
+        email:
+          type: string
+          example: "pedroaraujomarcato@gmail.com"
+
 paths:
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Cadastro de novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: E-mail já cadastrado ou dados inválidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "E-mail já cadastrado"
+
   /users/login:
     post:
       tags:
@@ -81,7 +140,7 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: "Credenciais invalidas"
+                    example: "Credenciais inválidas"
 
   /users/renovar:
     post:
@@ -106,7 +165,7 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: "Token invalido"
+                    example: "Token inválido"
 
   /tarefas:
     get:
@@ -187,7 +246,7 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: "ID invalido"
+                    example: "ID inválido"
         '404':
           description: Tarefa não encontrada
           content:
@@ -234,34 +293,10 @@ paths:
                 $ref: '#/components/schemas/Tarefa'
         '400':
           description: ID inválido
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "ID invalido"
         '404':
           description: Tarefa não encontrada
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Tarefa não encontrada"
         '422':
           description: Erro de validação
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Nome da tarefa deve ter pelo menos 3 caracteres"
 
     delete:
       tags:
@@ -281,21 +316,6 @@ paths:
           description: Tarefa deletada
         '400':
           description: ID inválido
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "ID invalido"
         '404':
           description: Tarefa não encontrada
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Tarefa não encontrada"
+          
