@@ -14,7 +14,7 @@ cd Trabalho_Backend
 2. Instale as dependências:
 
 npm install
-npm install express mongoose jsonwebtoken dotenv bcrypt
+npm install express mongoose jsonwebtoken dotenv bcrypt cookie-parser
 npm install --save-dev supertest jest nodemon
 
 
@@ -67,7 +67,8 @@ npm install express
 npm install mongoose      
 npm install jsonwebtoken  
 npm install dotenv
-npm install bcrypt               
+npm install bcrypt 
+npm install cookie-parser              
 
 
 2. Dependências de desenvolvimento
