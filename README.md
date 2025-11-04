@@ -1,3 +1,8 @@
+# API REST - Sistema de Livros com Autenticação JWT
+
+API desenvolvida em Node.js + Express + MongoDB com autenticação JWT e CRUD completo para o recurso Livros.  
+O sistema permite cadastrar usuários, realizar login e gerenciar livros autenticados.
+
 <!-- CONFIGURACAO: -->
 
 1. Clone o repositório:
@@ -8,7 +13,6 @@ cd Trabalho_Backend
 
 2. Instale as dependências:
 
-npx express-generator API_REST --no-view
 npm install
 npm install express mongoose jsonwebtoken dotenv bcrypt
 npm install --save-dev supertest jest nodemon
@@ -87,17 +91,17 @@ npm install
 
 npm run test
 
-Este comando executa todos os testes definidos em tests/tarefasRouter.test.js usando o Jest e Supertest.
+Este comando executa todos os testes definidos em tests/livrosRouter.test.js usando o Jest e Supertest.
 
 
 3. O que esperar ao rodar os testes
 
-Testes de criação de tarefas (POST):
+Testes de criação de livros (POST):
 	• Deve retornar 201 para criação bem-sucedida.
 	• Deve retornar 422 se o nome for inválido (curto ou vazio).
 
 Testes de leitura (GET):
-	• Deve retornar 200 e um array de tarefas.
+	• Deve retornar 200 e um array de livros.
 	• Para ID inválido, deve retornar 400.
 	• Para ID não encontrado, deve retornar 404.
 
@@ -120,28 +124,34 @@ Observação: Antes de rodar os testes, verifique se o MongoDB está ativo e que
 
 1. Cadastro de usuário
 
-Método: POST  
+Método: POST
 URL: http://localhost:3000/users/register
 
 Headers:
+
 Content-Type: application/json
+
 
 Body (JSON):
 
 {
-  "nome": "Pedro Marcato",
-  "email": "pedroaraujomarcato@gmail.com",
-  "senha": "abcd1234"
+  "nome": "SEU NOME",
+  "email": "SEU EMAIL",
+  "senha": "SUA SENHA"
 }
+
+
 Respostas possíveis:
 
 ✅ 201 Created
 
 {
   "id": "671a0e88...",
-  "nome": "Pedro Marcato",
-  "email": "pedroaraujomarcato@gmail.com"
+  "nome": "SEU NOME",
+  "email": "SEU EMAIL"
 }
+
+
 ⚠️ 422 Unprocessable Entity
 
 { "msg": "Email já cadastrado" }
@@ -154,12 +164,16 @@ URL: http://localhost:3000/users/login
 Headers:
 
 Content-Type: application/json
+
+
 Body (JSON):
 
 {
-  "email": "pedroaraujomarcato@gmail.com",
-  "senha": "abcd1234"
+  "email": "SEU EMAIL",
+  "senha": "SUA SENHA"
 }
+
+
 Respostas possíveis:
 
 ✅ 200 OK
@@ -167,9 +181,16 @@ Respostas possíveis:
 {
   "token": "eyJhbGciOiJIUzI1NiIs..."
 }
+
+
 ⚠️ 401 Unauthorized
 
 { "msg": "Credenciais inválidas" }
+
+
+🔐 Importante: O token retornado deve ser usado nos endpoints protegidos, enviando-o no cabeçalho:
+
+Authorization: Bearer token
 
 3. Criar um livro
 
@@ -185,9 +206,9 @@ Content-Type: application/json
 Body (JSON):
 
 {
-  "titulo": "Node.js para Iniciantes",
-  "autor": "Pedro Marcato",
-  "publicadoEm": "2025-11-02",
+  "titulo": "Aprendendo Express.js na Prática",
+  "autor": "José Reginaldo",
+  "publicadoEm": "2024-09-10",
   "disponivel": true
 }
 
@@ -197,10 +218,10 @@ Respostas possíveis:
 ✅ 201 Created
 
 {
-  "_id": "652e9b9f2f4e4a1a3c5f7e20",
-  "titulo": "Node.js para Iniciantes",
-  "autor": "Pedro Marcato",
-  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "id": "672a8e9b94a56b0023a48e01",
+  "titulo": "Aprendendo Express.js na Prática",
+  "autor": "José Reginaldo",
+  "publicadoEm": "2024-09-10",
   "disponivel": true
 }
 
@@ -215,25 +236,22 @@ Respostas possíveis:
 Método: GET
 URL: http://localhost:3000/livros
 
-Headers (opcional):
-
-Authorization: Bearer token
-
 
 Resposta (200 OK):
 
 [
   {
-    "_id": "652e9b9f2f4e4a1a3c5f7e20",
-    "titulo": "Node.js para Iniciantes",
-    "autor": "Pedro Marcato",
-    "publicadoEm": "2025-11-02T00:00:00.000Z",
+    "_id": "672a9b1f2f4e4a1a3c5f7e20",
+    "titulo": "Aprendendo Express.js na Prática",
+    "autor": "José Reginaldo",
+    "publicadoEm": "2024-09-10T00:00:00.000Z",
     "disponivel": true
   },
   {
-    "_id": "652e9baf2f4e4a1a3c5f7e21",
-    "titulo": "Express Avançado",
-    "autor": "Outro Autor",
+    "_id": "672a9baf2f4e4a1a3c5f7e21",
+    "titulo": "Node.js para Iniciantes",
+    "autor": "Pedro Marcato",
+    "publicadoEm": "2025-11-02T00:00:00.000Z",
     "disponivel": true
   }
 ]
@@ -246,7 +264,7 @@ URL: http://localhost:3000/livros/:id
 
 Exemplo:
 
-http://localhost:3000/livros/652e9b9f2f4e4a1a3c5f7e20
+http://localhost:3000/livros/672a9b1f2f4e4a1a3c5f7e20
 
 
 Respostas:
@@ -254,10 +272,10 @@ Respostas:
 ✅ 200 OK
 
 {
-  "_id": "652e9b9f2f4e4a1a3c5f7e20",
-  "titulo": "Node.js para Iniciantes",
-  "autor": "Pedro Marcato",
-  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "_id": "672a9b1f2f4e4a1a3c5f7e20",
+  "titulo": "Aprendendo Express.js na Prática",
+  "autor": "José Reginaldo",
+  "publicadoEm": "2024-09-10T00:00:00.000Z",
   "disponivel": true
 }
 
@@ -286,7 +304,7 @@ Content-Type: application/json
 Body (JSON):
 
 {
-  "titulo": "Node.js e Express",
+  "titulo": "Express.js Moderno com JWT",
   "disponivel": false
 }
 
@@ -296,10 +314,10 @@ Respostas:
 ✅ 200 OK
 
 {
-  "_id": "652e9b9f2f4e4a1a3c5f7e20",
-  "titulo": "Node.js e Express",
-  "autor": "Pedro Marcato",
-  "publicadoEm": "2025-11-02T00:00:00.000Z",
+  "_id": "672a9b1f2f4e4a1a3c5f7e20",
+  "titulo": "Express.js Moderno com JWT",
+  "autor": "José Reginaldo",
+  "publicadoEm": "2024-09-10T00:00:00.000Z",
   "disponivel": false
 }
 

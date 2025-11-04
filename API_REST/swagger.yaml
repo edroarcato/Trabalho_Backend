@@ -1,191 +1,125 @@
 openapi: 3.0.3
 info:
-  title: API de Tarefas e Usuários
-  description: API REST para gerenciamento de tarefas com autenticação JWT
-  version: "1.1.0"
+  title: API de Livros
+  description: >
+    API RESTful para gerenciamento de livros com autenticação JWT.  
+    Permite cadastrar, listar, atualizar e excluir livros no banco de dados MongoDB.
+  version: 1.0.0
+  contact:
+    name: Pedro Araújo Marcato
+    email: pedroaraujomarcato@gmail.com
 
 servers:
   - url: http://localhost:3000
     description: Servidor local
 
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  schemas:
-    Tarefa:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "64fbcf1e7d3a2c0012345678"
-        nome:
-          type: string
-          example: "Estudar"
-        concluida:
-          type: boolean
-          example: false
-      required:
-        - id
-        - nome
-        - concluida
-
-    LoginRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          example: "pedroaraujomarcato@gmail.com"
-        senha:
-          type: string
-          example: "abcd1234"
-      required:
-        - email
-        - senha
-
-    LoginResponse:
-      type: object
-      properties:
-        token:
-          type: string
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-
-    UserRegisterRequest:
-      type: object
-      properties:
-        nome:
-          type: string
-          example: "Pedro Marcato"
-        email:
-          type: string
-          example: "pedroaraujomarcato@gmail.com"
-        senha:
-          type: string
-          example: "abcd1234"
-      required:
-        - nome
-        - email
-        - senha
-
-    UserResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "671a0e88..."
-        nome:
-          type: string
-          example: "Pedro Marcato"
-        email:
-          type: string
-          example: "pedroaraujomarcato@gmail.com"
+tags:
+  - name: Autenticação
+    description: Endpoints de login e cadastro de usuários
+  - name: Livros
+    description: Endpoints para gerenciamento de livros
 
 paths:
   /users/register:
     post:
-      tags:
-        - Users
-      summary: Cadastro de novo usuário
+      tags: [Autenticação]
+      summary: Cadastrar um novo usuário
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegisterRequest'
+              type: object
+              properties:
+                nome:
+                  type: string
+                  example: Pedro Marcato
+                email:
+                  type: string
+                  example: pedroaraujomarcato@gmail.com
+                senha:
+                  type: string
+                  example: abcd1234
       responses:
-        '201':
+        "201":
           description: Usuário criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
-        '400':
-          description: E-mail já cadastrado ou dados inválidos
+                type: object
+                example:
+                  id: "671a0e88..."
+                  nome: "Pedro Marcato"
+                  email: "pedroaraujomarcato@gmail.com"
+        "422":
+          description: Email já cadastrado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "E-mail já cadastrado"
+                example:
+                  msg: "Email já cadastrado"
 
   /users/login:
     post:
-      tags:
-        - Users
-      summary: Autenticação do usuário
+      tags: [Autenticação]
+      summary: Fazer login de usuário e gerar token JWT
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: pedroaraujomarcato@gmail.com
+                senha:
+                  type: string
+                  example: abcd1234
       responses:
-        '200':
-          description: Token JWT gerado
+        "200":
+          description: Login bem-sucedido
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '401':
+                example:
+                  token: "eyJhbGciOiJIUzI1NiIs..."
+        "401":
           description: Credenciais inválidas
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Credenciais inválidas"
+                example:
+                  msg: "Credenciais inválidas"
 
-  /users/renovar:
-    post:
-      tags:
-        - Users
-      summary: Renovar token JWT
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Novo token JWT gerado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '401':
-          description: Token inválido
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Token inválido"
-
-  /tarefas:
+  /livros:
     get:
-      tags:
-        - Tarefas
-      summary: Lista todas as tarefas
+      tags: [Livros]
+      summary: Listar todos os livros
       responses:
-        '200':
-          description: Lista de tarefas
+        "200":
+          description: Lista de livros
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tarefa'
+                  $ref: "#/components/schemas/Livro"
+                example:
+                  - _id: "672a9b1f2f4e4a1a3c5f7e20"
+                    titulo: "Aprendendo Express.js na Prática"
+                    autor: "José Reginaldo"
+                    publicadoEm: "2024-09-10T00:00:00.000Z"
+                    disponivel: true
+                  - _id: "672a9baf2f4e4a1a3c5f7e21"
+                    titulo: "Node.js para Iniciantes"
+                    autor: "Pedro Marcato"
+                    publicadoEm: "2025-11-02T00:00:00.000Z"
+                    disponivel: true
 
     post:
-      tags:
-        - Tarefas
-      summary: Cria uma nova tarefa
+      tags: [Livros]
+      summary: Criar um novo livro
       security:
         - bearerAuth: []
       requestBody:
@@ -193,129 +127,182 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nome:
-                  type: string
-                  example: "Estudar"
-              required:
-                - nome
+              $ref: "#/components/schemas/Livro"
+            example:
+              titulo: "Aprendendo Express.js na Prática"
+              autor: "José Reginaldo"
+              publicadoEm: "2024-09-10"
+              disponivel: true
       responses:
-        '201':
-          description: Tarefa criada
+        "201":
+          description: Livro criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tarefa'
-        '422':
-          description: Erro de validação
+                $ref: "#/components/schemas/Livro"
+              example:
+                _id: "672a9b1f2f4e4a1a3c5f7e20"
+                titulo: "Aprendendo Express.js na Prática"
+                autor: "José Reginaldo"
+                publicadoEm: "2024-09-10T00:00:00.000Z"
+                disponivel: true
+        "422":
+          description: Dados inválidos
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Nome da tarefa é obrigatório"
+                example:
+                  msg: "Título deve ter pelo menos 3 caracteres"
 
-  /tarefas/{id}:
+  /livros/{id}:
     get:
-      tags:
-        - Tarefas
-      summary: Retorna uma tarefa pelo ID
+      tags: [Livros]
+      summary: Buscar um livro por ID
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
+          required: true
           schema:
             type: string
-          required: true
-          description: ID da tarefa
+          example: 672a9b1f2f4e4a1a3c5f7e20
       responses:
-        '200':
-          description: Tarefa encontrada
+        "200":
+          description: Livro encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tarefa'
-        '400':
+                $ref: "#/components/schemas/Livro"
+              example:
+                _id: "672a9b1f2f4e4a1a3c5f7e20"
+                titulo: "Aprendendo Express.js na Prática"
+                autor: "José Reginaldo"
+                publicadoEm: "2024-09-10T00:00:00.000Z"
+                disponivel: true
+        "400":
           description: ID inválido
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "ID inválido"
-        '404':
-          description: Tarefa não encontrada
+                example:
+                  msg: "ID inválido"
+        "404":
+          description: Livro não encontrado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: "Tarefa não encontrada"
+                example:
+                  msg: "Livro não encontrado"
 
     put:
-      tags:
-        - Tarefas
-      summary: Atualiza uma tarefa pelo ID
+      tags: [Livros]
+      summary: Atualizar um livro por ID
       security:
         - bearerAuth: []
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
+          required: true
           schema:
             type: string
-          required: true
-          description: ID da tarefa
+          example: 672a9b1f2f4e4a1a3c5f7e20
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nome:
-                  type: string
-                  example: "Estudar REST"
-                concluida:
-                  type: boolean
-                  example: true
+              $ref: "#/components/schemas/Livro"
+            example:
+              titulo: "Express.js Moderno com JWT"
+              disponivel: false
       responses:
-        '200':
-          description: Tarefa atualizada
+        "200":
+          description: Livro atualizado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tarefa'
-        '400':
+                $ref: "#/components/schemas/Livro"
+              example:
+                _id: "672a9b1f2f4e4a1a3c5f7e20"
+                titulo: "Express.js Moderno com JWT"
+                autor: "José Reginaldo"
+                publicadoEm: "2024-09-10T00:00:00.000Z"
+                disponivel: false
+        "422":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                example:
+                  msg: "Título deve ter pelo menos 3 caracteres"
+        "400":
           description: ID inválido
-        '404':
-          description: Tarefa não encontrada
-        '422':
-          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                example:
+                  msg: "ID inválido"
+        "404":
+          description: Livro não encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  msg: "Livro não encontrado"
 
     delete:
-      tags:
-        - Tarefas
-      summary: Deleta uma tarefa pelo ID
+      tags: [Livros]
+      summary: Excluir um livro por ID
       security:
         - bearerAuth: []
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
+          required: true
           schema:
             type: string
-          required: true
-          description: ID da tarefa
+          example: 672a9b1f2f4e4a1a3c5f7e20
       responses:
-        '204':
-          description: Tarefa deletada
-        '400':
+        "204":
+          description: Livro excluído com sucesso
+        "400":
           description: ID inválido
-        '404':
-          description: Tarefa não encontrada
-          
+          content:
+            application/json:
+              schema:
+                example:
+                  msg: "ID inválido"
+        "404":
+          description: Livro não encontrado
+          content:
+            application/json:
+              schema:
+                example:
+                  msg: "Livro não encontrado"
+
+components:
+  schemas:
+    Livro:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 672a9b1f2f4e4a1a3c5f7e20
+        titulo:
+          type: string
+          example: "Aprendendo Express.js na Prática"
+        autor:
+          type: string
+          example: "José Reginaldo"
+        publicadoEm:
+          type: string
+          format: date
+          example: "2024-09-10"
+        disponivel:
+          type: boolean
+          example: true
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

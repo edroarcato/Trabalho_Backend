@@ -4,7 +4,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 
-const tarefasRouter = require('./routes/tarefasRouter')
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const livrosRouter = require('./routes/livrosRouter');
@@ -22,7 +21,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/tarefas', tarefasRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/livros', livrosRouter);
