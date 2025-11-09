@@ -1,4 +1,4 @@
-# API REST - Sistema de Livros com Autenticação JWT
+# API REST para gerenciamento de livros.
 
 API desenvolvida em Node.js + Express + MongoDB com autenticação JWT e CRUD completo para o recurso Livros.  
 O sistema permite cadastrar usuários, realizar login e gerenciar livros autenticados.
@@ -16,6 +16,7 @@ cd Trabalho_Backend
 npm install
 npm install express mongoose jsonwebtoken dotenv bcrypt cookie-parser
 npm install --save-dev supertest jest nodemon
+npm install swagger-ui-express yaml
 
 
 3. Configure as variáveis de ambiente:
@@ -68,7 +69,8 @@ npm install mongoose
 npm install jsonwebtoken  
 npm install dotenv
 npm install bcrypt 
-npm install cookie-parser              
+npm install cookie-parser 
+npm install swagger-ui-express yaml             
 
 
 2. Dependências de desenvolvimento

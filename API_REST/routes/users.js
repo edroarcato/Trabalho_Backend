@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
-const { gerarToken, verificarToken } = require('../middlewares/auth');
+const { gerarToken } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -48,20 +48,6 @@ router.post('/login', async (req, res) => {
 
     const token = gerarToken(payload);
     return res.json({ token });
-  } catch (err) {
-    return res.status(500).json({ msg: err.message });
-  }
-});
-
-router.post('/renovar', verificarToken, (req, res) => {
-  try {
-    const payload = {
-      iss: req.payload.iss,
-      email: req.payload.email,
-      nome: req.payload.nome,
-      perfil: req.payload.perfil
-    };
-    return res.json({ token: gerarToken(payload) });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
