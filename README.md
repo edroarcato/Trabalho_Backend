@@ -22,11 +22,11 @@ npm install swagger-ui-express yaml
 3. Configure as variáveis de ambiente:
 Crie um arquivo .env na raiz do projeto com o seguinte conteúdo:
 
-MONGODB_USER=usrTarefas
-MONGODB_PASS=abcd1234
-MONGODB_HOST=bd-academico.kvvoqpc.mongodb.net
-MONGODB_DBNAME=API_REST
-JWT_SEGREDO=abcd1234
+MONGODB_USER=usuario-do-seu-mongodb
+MONGODB_PASS=senha-do-seu-mongodb
+MONGODB_HOST=url-do-seu-mongodb
+MONGODB_DBNAME=nome-do-banco-de-dados
+JWT_SEGREDO=sua-senha-jwt
 
 
 Ajuste os valores conforme seu ambiente e credenciais do MongoDB.

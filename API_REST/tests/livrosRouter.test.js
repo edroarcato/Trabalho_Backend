@@ -7,7 +7,7 @@ const request = supertest(app);
 const url = '/livros';
 
 // Adicione aqui o novo token gerado no postman
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNaW5oYSBBUEkiLCJlbWFpbCI6InBlZHJvcm9kcmlndWVzQGdtYWlsLmNvbSIsIm5vbWUiOiJQZWRybyBSb2RyaWd1ZXMiLCJwZXJmaWwiOiJ1c2VyIiwiaWF0IjoxNzYyNTY5NDk4LCJleHAiOjE3NjI1Njk3OTh9.cTQmWI_JJwf_XaibB--8yV1JJKE_sTbXhfHGLncNqXM";
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNaW5oYSBBUEkiLCJlbWFpbCI6InBlZHJvLm1hcmNhdG9AaWVzYi5lZHUuYnIiLCJub21lIjoiUGVkcm8gTWFyY2F0byIsInBlcmZpbCI6InVzZXIiLCJpYXQiOjE3NjI5MDMzNTYsImV4cCI6MTc2MjkwMzY1Nn0.H4UHGcxup3atJywrpQ1ZNCWlc5bfuWhcsMLOKausLpI";
 
 let id = null;
 
