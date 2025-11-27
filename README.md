@@ -27,6 +27,8 @@ MONGODB_PASS=senha-do-seu-mongodb
 MONGODB_HOST=url-do-seu-mongodb
 MONGODB_DBNAME=nome-do-banco-de-dados
 JWT_SEGREDO=sua-senha-jwt
+TEST_EMAIL=seu-email
+TEST_PASSWORD=sua-senha
 
 
 Ajuste os valores conforme seu ambiente e credenciais do MongoDB.

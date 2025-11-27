@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const supertest = require('supertest');
 
 const app = require('../app');
@@ -6,17 +8,30 @@ const request = supertest(app);
 
 const url = '/livros';
 
-// Adicione aqui o novo token gerado no postman
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNaW5oYSBBUEkiLCJlbWFpbCI6InBlZHJvLm1hcmNhdG9AaWVzYi5lZHUuYnIiLCJub21lIjoiUGVkcm8gTWFyY2F0byIsInBlcmZpbCI6InVzZXIiLCJpYXQiOjE3NjI5MDMzNTYsImV4cCI6MTc2MjkwMzY1Nn0.H4UHGcxup3atJywrpQ1ZNCWlc5bfuWhcsMLOKausLpI";
-
 let id = null;
+let authHeader = null;
+
+beforeAll(async () => {
+    const response = await request
+        .post('/users/login')
+        .send({
+            email: process.env.TEST_EMAIL,
+            senha: process.env.TEST_PASSWORD
+        });
+
+    if (!response.body.token) {
+        throw new Error('❌ Login falhou: token não foi gerado');
+    }
+
+    authHeader = `Bearer ${response.body.token}`;
+});
 
 describe('Testes do recurso /livros', () => {
 
     test('POST / deve retornar 201', async () => {
         const response = await request
             .post(url)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({
                 titulo: "Node.js para Iniciantes",
                 autor: "Pedro Marcato",
@@ -33,7 +48,7 @@ describe('Testes do recurso /livros', () => {
     test('POST / deve retornar 422 (título curto)', async () => {
         const response = await request
             .post(url)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({ titulo: "No", autor: "Pedro" });
         expect(response.status).toBe(422);
         expect(response.body.msg).toBe("Título deve ter pelo menos 3 caracteres");
@@ -42,7 +57,7 @@ describe('Testes do recurso /livros', () => {
     test('POST / deve retornar 422 (título vazio)', async () => {
         const response = await request
             .post(url)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({ titulo: "   ", autor: "Pedro" });
         expect(response.status).toBe(422);
         expect(response.body.msg).toBe("Título é obrigatório");
@@ -76,7 +91,7 @@ describe('Testes do recurso /livros', () => {
     test('PUT / id deve retornar 200', async () => {
         const response = await request
             .put(`${url}/${id}`)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({
                 titulo: "Node.js e Express",
                 disponivel: false
@@ -89,7 +104,7 @@ describe('Testes do recurso /livros', () => {
     test('PUT / id deve retornar 400', async () => {
         const response = await request
             .put(`${url}/0`)
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", authHeader);
         expect(response.status).toBe(400);
         expect(response.body.msg).toBe("ID inválido");
     });
@@ -97,7 +112,7 @@ describe('Testes do recurso /livros', () => {
     test('PUT / id deve retornar 404', async () => {
         const response = await request
             .put(`${url}/000000000000000000000000`)
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", authHeader);
         expect(response.status).toBe(404);
         expect(response.body.msg).toBe("Livro não encontrado");
     });
@@ -105,7 +120,7 @@ describe('Testes do recurso /livros', () => {
     test('PUT / id deve retornar 422 (título vazio)', async () => {
         const response = await request
             .put(`${url}/${id}`)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({ titulo: "   " });
         expect(response.status).toBe(422);
         expect(response.body.msg).toBe("Título é obrigatório");
@@ -114,7 +129,7 @@ describe('Testes do recurso /livros', () => {
     test('PUT /:id deve retornar 422 (título curto)', async () => {
         const response = await request
             .put(`${url}/${id}`)
-            .set("Authorization", `Bearer ${token}`)
+            .set("Authorization", authHeader)
             .send({ titulo: "No" });
         expect(response.status).toBe(422);
         expect(response.body.msg).toBe("Título deve ter pelo menos 3 caracteres");
@@ -123,14 +138,14 @@ describe('Testes do recurso /livros', () => {
     test('DELETE / id deve retornar 204', async () => {
         const response = await request
             .delete(`${url}/${id}`)
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", authHeader);
         expect(response.status).toBe(204);
     });
 
     test('DELETE /:id deve retornar 400', async () => {
         const response = await request
             .delete(`${url}/0`)
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", authHeader);
         expect(response.status).toBe(400);
         expect(response.body.msg).toBe("ID inválido");
     });
@@ -138,7 +153,7 @@ describe('Testes do recurso /livros', () => {
     test('DELETE /:id deve retornar 404', async () => {
         const response = await request
             .delete(`${url}/${id}`)
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", authHeader);
         expect(response.status).toBe(404);
         expect(response.body.msg).toBe("Livro não encontrado");
     });
